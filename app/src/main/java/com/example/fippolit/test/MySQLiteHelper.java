@@ -7,21 +7,25 @@ import android.util.Log;
 
 /**
  * Created by fippolit on 17/07/2017.
+ *
+ * This class is responsible for creating the database.
+ * The onUpgrade() method will simply delete all existing data and re-create the table.
+ * It also defines several constants for the table name and the table columns.
  */
 
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
-    public static final String TABLE_COMMENTS = "comments";
+    public static final String TABLE_COMMENTS = "meteostats";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_COMMENT = "comment";
+    public static final String COLUMN_DATE = "date";
 
-    private static final String DATABASE_NAME = "commments.db";
+    private static final String DATABASE_NAME = "meteo.db";
     private static final int DATABASE_VERSION = 1;
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table "
             + TABLE_COMMENTS + "( " + COLUMN_ID
-            + " integer primary key autoincrement, " + COLUMN_COMMENT
+            + " integer primary key autoincrement, " + COLUMN_DATE
             + " text not null);";
 
     public MySQLiteHelper(Context context) {

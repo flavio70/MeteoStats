@@ -12,6 +12,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 /**
  * Created by fippolit on 17/07/2017.
+ *
+ *
+ * This class is our DAO. It maintains the database connection and supports adding new records and fetching all records.
  */
 
 public class MeteosDataSource {
@@ -19,7 +22,7 @@ public class MeteosDataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
     private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
-            MySQLiteHelper.COLUMN_COMMENT };
+            MySQLiteHelper.COLUMN_DATE };
 
     public MeteosDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -33,28 +36,28 @@ public class MeteosDataSource {
         dbHelper.close();
     }
 
-    public Meteo createComment(String comment) {
+    public Meteo createMeteo(String data) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_COMMENT, comment);
+        values.put(MySQLiteHelper.COLUMN_DATE, data);
         long insertId = database.insert(MySQLiteHelper.TABLE_COMMENTS, null,
                 values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
                 allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null,
                 null, null, null);
         cursor.moveToFirst();
-        Meteo newMeteo = cursorToComment(cursor);
+        Meteo newMeteo = cursorToMeteo(cursor);
         cursor.close();
         return newMeteo;
     }
 
-    public void deleteComment(Meteo meteo) {
+    public void deleteMeteo(Meteo meteo) {
         long id = meteo.getId();
         System.out.println("Meteo deleted with id: " + id);
         database.delete(MySQLiteHelper.TABLE_COMMENTS, MySQLiteHelper.COLUMN_ID
                 + " = " + id, null);
     }
 
-    public List<Meteo> getAllComments() {
+    public List<Meteo> getAllMeteos() {
         List<Meteo> meteos = new ArrayList<Meteo>();
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
@@ -62,7 +65,7 @@ public class MeteosDataSource {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            Meteo meteo = cursorToComment(cursor);
+            Meteo meteo = cursorToMeteo(cursor);
             meteos.add(meteo);
             cursor.moveToNext();
         }
@@ -71,10 +74,10 @@ public class MeteosDataSource {
         return meteos;
     }
 
-    private Meteo cursorToComment(Cursor cursor) {
+    private Meteo cursorToMeteo(Cursor cursor) {
         Meteo meteo = new Meteo();
         meteo.setId(cursor.getLong(0));
-        meteo.setComment(cursor.getString(1));
+        meteo.setData(cursor.getString(1));
         return meteo;
     }
 }
