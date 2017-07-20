@@ -1,6 +1,7 @@
 package com.example.fippolit.test;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.List;
 
 //MainActivity is the application entry point
 public class MainActivity extends AppCompatActivity {
+    public static final String WIND_DATATIME = "com.example.fippolit.WIND_DATATIME";
+    public static final String WIND_ACTUALS = "com.example.fippolit.WIND_ACTUALS";
+    public static final String WIND_FORECASTS = "com.example.fippolit.WIND_FORECASTS";
     private MeteosDataSource datasource;
     ListView listView;
 
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Init","Getting DB resources...");
 
         // get db record to display in ListView
-        List<Meteo> values = datasource.getAllMeteos();
+        ArrayList<Meteo> values = datasource.getAllMeteos();
 
         // print some log stuff
         for (Meteo meteo : values) {
@@ -45,18 +50,9 @@ public class MainActivity extends AppCompatActivity {
             // Writing DB entries to log
             Log.d("Meteo:: ", log);
         }
-        // Define a new Adapter
-        // use the SimpleCursorAdapter to show the
-        // elements in a ListView
-        // First parameter - Context
-        // Second parameter - Layout for the row
-        // Third parameter - ID of the TextView to which the data is written
-        // Forth - the Array of data
-        ArrayAdapter<Meteo> adapter = new ArrayAdapter<Meteo>(this,
-                android.R.layout.simple_list_item_1, values);
-
-        // Assign adapter to ListView
-        listView.setAdapter(adapter);
+        // Define a new Adapter and
+        // assign it to ListView
+        listView.setAdapter(new MyCustomBaseAdapter(this, values));
 
         //listView item click listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,21 +65,34 @@ public class MainActivity extends AppCompatActivity {
 
                 // Show Alert
                 Toast.makeText(getApplicationContext(),
-                        "Position :"+position+"  ListItem : " +itemValue.getData() , Toast.LENGTH_LONG)
+                        itemValue.getData()+"\nForecasts: " +itemValue.getForecasts()
+                        +"\nMeasured: " +itemValue.getActuals(), Toast.LENGTH_LONG)
                         .show();
+                //Show Wind activity
+                showWind(itemValue);
 
             }
         });
     }
 
+
+    public void showWind(Meteo meteo){
+        Intent intent = new Intent(this, DisplayWindActivity.class);
+        intent.putExtra(WIND_DATATIME, meteo.getData());
+        intent.putExtra(WIND_ACTUALS, meteo.getActuals());
+        intent.putExtra(WIND_FORECASTS, meteo.getForecasts());
+        startActivity(intent);
+    }
+
     /** Called when the user taps the addNew button */
     public void clickButton(View view) {
         // Do something in response to button
-        ArrayAdapter<Meteo> adapter = (ArrayAdapter<Meteo>) listView.getAdapter();
+        MyCustomBaseAdapter adapter = (MyCustomBaseAdapter) listView.getAdapter();
         Meteo meteo = null;
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MMMM/d - HH:mm");
         String strCurrDate = sdf.format(cal.getTime());
+
 
         switch (view.getId()) {
             case R.id.add:
@@ -96,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         if(currDate.after(dbDate)){
                             Log.d("clickButton","added item "+ strCurrDate +" to db");
                             meteo = datasource.createMeteo(strCurrDate);
-                            adapter.add(meteo);
+                           adapter.add(meteo);
                         } else {
                             Log.d("clickButton","Item "+strCurrDate+" NOT added to db. Already present");
                         }

@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
  *
  * This class is our DAO. It maintains the database connection and supports adding new records and fetching all records.
  */
-
+@SuppressWarnings("WeakerAccess")
 public class MeteosDataSource {
     // Database fields
     private SQLiteDatabase database;
@@ -57,8 +57,8 @@ public class MeteosDataSource {
                 + " = " + id, null);
     }
 
-    public List<Meteo> getAllMeteos() {
-        List<Meteo> meteos = new ArrayList<Meteo>();
+    public ArrayList<Meteo> getAllMeteos() {
+        ArrayList<Meteo> meteos = new ArrayList<Meteo>();
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
                 allColumns, null, null, null, null, null);
@@ -78,6 +78,8 @@ public class MeteosDataSource {
         Meteo meteo = new Meteo();
         meteo.setId(cursor.getLong(0));
         meteo.setData(cursor.getString(1));
+        meteo.setForecasts("txtforecasts");
+        meteo.setActuals("txtactuals");
         return meteo;
     }
 }

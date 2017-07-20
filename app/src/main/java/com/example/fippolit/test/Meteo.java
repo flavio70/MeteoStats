@@ -6,10 +6,12 @@ package com.example.fippolit.test;
  * This class is our model and contains the data we will save in the database and show in the user interface.
  * Will contains also methods to access data
  */
-
+@SuppressWarnings("WeakerAccess")
 public class Meteo {
     private long id;
     private String data;
+    private String forecasts;
+    private String actuals;
 
     public long getId() {
         return id;
@@ -27,6 +29,22 @@ public class Meteo {
         this.data = data;
     }
 
+
+    public String getForecasts() {
+        return forecasts;
+    }
+
+    public void setForecasts(String forecasts) {
+        this.forecasts = forecasts;
+    }
+
+    public String getActuals() {
+        return actuals;
+    }
+
+    public void setActuals(String actuals) {
+        this.actuals = actuals;
+    }
     // Will be used by the ArrayAdapter in the ListView
     @Override
     public String toString() {
